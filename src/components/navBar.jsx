@@ -1,19 +1,29 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Redirect } from "react-router-dom";
+import GroupList from "./groupList";
 
 const NavBar = () => {
+    const menu = [
+        { _id: 1, name: "Main", path: "/" },
+        { _id: 2, name: "Login", path: "/login" },
+        { _id: 3, name: "Users", path: "/users" }
+    ];
+    const [menuItem, setMenuItem] = useState(menu[0]);
+    const handleItemSelect = (item) => {
+        setMenuItem(item);
+    };
+
     return (
-        <ul className="nav">
-            <li className="nav-item">
-                <Link className="nav-link" to="/">Main</Link>
-            </li>
-            <li className="nav-item">
-                <Link className="nav-link" to="/login">Login</Link>
-            </li>
-            <li className="nav-item">
-                <Link className="nav-link" to="/users">Users</Link>
-            </li>
-        </ul>
+        <>
+            <GroupList
+                items = {menu}
+                onItemSelect = {handleItemSelect}
+                selectedItem = {menuItem}
+                isHorizontal = {true}
+            />
+            <Redirect to={menuItem.path} />
+        </>
+
     );
 };
 
