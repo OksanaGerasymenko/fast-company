@@ -1,35 +1,34 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Qualities from "./qualities";
-import Bookmark from "./bookmark";
+import PropTypes from "prop-types";
+import api from "../api";
 
-const User = (user) => {
+const User = ({ userId }) => {
+    const [user, setUser] = useState();
+    useEffect(() => {
+        api.users.getById(userId).then(user => setUser(user));
+    }, []);
+
     return (
-        <tr key={user._id}>
-            <td>{user.name}</td>
-            <td>
-                {" "}
-                <Qualities qualities={user.qualities} />
-            </td>
-            <td>{user.profession.name}</td>
-            <td className="text-center">{user.completedMeetings}</td>
-            <td className="text-center">{user.rate}/5</td>
-            <td className="text-center">
-                <Bookmark
-                    userId={user._id}
-                    bookmark={user.bookmark}
-                    onChangeBookmark={user.onChangeBookmark}
-                />
-            </td>
-            <td>
-                <button
-                    className="btn btn-danger"
-                    onClick={() => user.onDelete(user._id)}
-                >
-                    delete
-                </button>
-            </td>
-        </tr>
+        <>
+            {user
+                ? <div className="card w-25 text-center m-3">
+                    <h2 className="card-header">{user.name}</h2>
+                    <div className="card-body">
+                        <h4 className="card-text">Профессия: {user.profession.name}</h4>
+                        <p><Qualities qualities={user.qualities} /></p>
+                        <p className="card-text">completedMeetings:{user.completedMeetings}</p>
+                        <h5 className="card-text">Rate: {user.rate}</h5>
+                        <p></p>
+                        <Link to="/users" className="btn btn-warning">Все пользователи</Link>
+                    </div>
+                </div>
+                : "Loading..."}
+        </>
     );
 };
-
+User.propTypes = {
+    userId: PropTypes.string.isRequired
+};
 export default User;

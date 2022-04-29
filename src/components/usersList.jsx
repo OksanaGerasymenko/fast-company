@@ -7,7 +7,7 @@ import GroupList from "./groupList";
 import SearchStatus from "./searchStatus";
 import _ from "lodash";
 
-const Users = () => {
+const UsersList = () => {
     const pageSize = 8;
     const [users, setUsers] = useState();
 
@@ -107,4 +107,4 @@ const Users = () => {
     return "Loading...";
 };
 
-export default Users;
+export default UsersList;
