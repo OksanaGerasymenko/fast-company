@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Redirect } from "react-router-dom";
-import GroupList from "./groupList";
+import GroupList from "../common/groupList";
 const menu = [
     { _id: 1, name: "Main", path: "/" },
     { _id: 2, name: "Login", path: "/login" },

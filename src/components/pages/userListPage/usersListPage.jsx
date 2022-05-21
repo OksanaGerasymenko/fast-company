@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import UsersTable from "./usersTable";
-import Pagination from "./pagination";
-import { paginate } from "../utils/paginate";
-import { searchItems } from "../utils/searchItems";
-import api from "../api";
-import GroupList from "./groupList";
-import SearchStatus from "./searchStatus";
+import UsersTable from "../../ui/usersTable";
+import Pagination from "../../common/pagination";
+import { paginate } from "../../../utils/paginate";
+import { searchItems } from "../../../utils/searchItems";
+import api from "../../../api";
+import GroupList from "../../common/groupList";
+import SearchStatus from "../../ui/searchStatus";
 import _ from "lodash";
 
-const UsersList = () => {
+const UsersListPage = () => {
     const pageSize = 8;
     const [users, setUsers] = useState();
 
@@ -122,4 +122,4 @@ const UsersList = () => {
     return "Loading...";
 };
 
-export default UsersList;
+export default UsersListPage;

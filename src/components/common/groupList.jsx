@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 const GroupList = ({ items, valueProperty, contentProperty, onItemSelect, selectedItem, isHorizontal }) => {
     const arrayOfItems = Array.isArray(items)
         ? items
-        : Object.keys(items).reduce((key) => items[key], []);
+        : Object.values(items);
     return (
         <>
             <ul className={"list-group" + (isHorizontal ? " list-group-horizontal list-group-flush" : "")}>

@@ -1,13 +1,19 @@
 import React from "react";
-import UsersList from "../components/usersList";
-import User from "../components/user";
+import UsersListPage from "../components/pages/userListPage";
+import UserPage from "../components/pages/userPage";
+import EditPage from "../components/ui/editForm";
 import { useParams } from "react-router-dom";
 
 const Users = () => {
-    const userId = useParams().userId;
+    const { userId, edit } = useParams();
     return (
         <>
-            {userId ? <User userId={userId} /> : <UsersList />}
+            {userId && edit
+                ? <EditPage userId={userId} />
+                : userId
+                    ? <UserPage userId={userId} />
+                    : <UsersListPage />
+            }
         </>
     );
 };

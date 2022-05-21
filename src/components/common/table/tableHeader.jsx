@@ -1,5 +1,5 @@
 import React from "react";
-import ArrowSort from "./arrowSort";
+import ArrowSort from "../arrowSort";
 import PropTypes from "prop-types";
 
 const TableHeader = ({ onSort, selectedSort, columns }) => {

@@ -3,16 +3,22 @@ export function validator(data, config) {
     const validate = (validateMethod, data, config) => {
         let statusValidate;
         switch (validateMethod) {
-        case "isRequired":
-            statusValidate = data.trim() === "";
+        case "isRequired": {
+            if (typeof data === "boolean") {
+                statusValidate = !data;
+            } else {
+                statusValidate = data.trim() === "";
+            };
             break;
+        }
+
         case "isEmail": {
             const exp = /^\S+@\S+\.\S+$/g;
             statusValidate = !exp.test(data);
             break;
         }
         case "containCapitalCharacter": {
-            const exp = /[A-Z]+/g;
+            const exp = /[A-Z, А-Я]+/g;
             statusValidate = !exp.test(data);
             break;
         }
