@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import Qualities from "../../ui/qualities";
+import QualitiesCard from "../../ui/qualitiesCard";
+import UserCard from "../../ui/userCard";
+import MeetingsCard from "../../ui/meetingsCard";
+import Comments from "../../ui/comments";
 import PropTypes from "prop-types";
 import api from "../../../api";
 
@@ -11,21 +13,21 @@ const UserPage = ({ userId }) => {
     }, []);
 
     return (
-        <>
+        <div className="container">
             {user
-                ? <div className="card w-25 text-center m-3">
-                    <h2 className="card-header">{user.name}</h2>
-                    <div className="card-body">
-                        <h4 className="card-text">Профессия: {user.profession.name}</h4>
-                        <p><Qualities qualities={user.qualities} /></p>
-                        <p className="card-text">completedMeetings:{user.completedMeetings}</p>
-                        <h5 className="card-text mb-2">Rate: {user.rate}</h5>
-                        <Link to={`/users/${userId}/edit`} className="btn btn-warning me-2">Изменить</Link>
-                        <Link to="/users" className="btn btn-warning">Все пользователи</Link>
+                ? <div className="row gutters-sm">
+                    <div className="col-md-4 mb-3">
+                        <UserCard user={user}/>
+                        <QualitiesCard qualities={user.qualities}/>
+                        <MeetingsCard value={user.completedMeetings} />
+                    </div>
+                    <div className="col-md-8">
+                        <Comments />
                     </div>
                 </div>
-                : "Loading..."}
-        </>
+                : "Loading..."
+            }
+        </div>
     );
 };
 UserPage.propTypes = {

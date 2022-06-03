@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useHistory } from "react-router";
 import { validator } from "../../utils/validator";
 import TextField from "../common/form/textField";
 import SelectField from "../common/form/selectField";
@@ -13,6 +13,7 @@ const EditForm = ({ userId }) => {
     const [professions, setProfessions] = useState([]);
     const [qualities, setQualities] = useState([]);
     const [errors, setErrors] = useState({});
+    const history = useHistory();
     useEffect(() => {
         api.users.getById(userId).then(user => {
             const userQualitiesForForm = user.qualities.map(quality => ({
@@ -55,7 +56,7 @@ const EditForm = ({ userId }) => {
             setQualities(qualitiesArray);
         });
     }, []);
-    useEffect(() => { validate(); console.log("data2: ", data); }, [data]);
+    useEffect(() => { validate(); }, [data]);
 
     const validateConfig = {
         email: {
@@ -113,6 +114,14 @@ const EditForm = ({ userId }) => {
         data._id
             ? <div className="container mt-5">
                 <div className="row">
+                    <div className="col-md-3 offset-md-1">
+                        <button className="btn btn-primary" onClick={() => history.goBack()}>
+                            <i className="bi bi-caret-left-fill"></i>
+                            Назад
+                        </button>
+                    </div>
+                </div>
+                <div className="row">
                     <div className="col-md-6 offset-md-3 shadow p-4">
                         <h3 className="mb-4 text-center">Редактирование профиля</h3>
                         <form onSubmit={handleSubmit}>
@@ -160,7 +169,6 @@ const EditForm = ({ userId }) => {
                             />
                             <div className="d-flex justify-content-evenly">
                                 <button disabled={!isValid} className="btn btn-primary mb-4">Сохранить</button>
-                                <Link to="/users" className="btn btn-warning mb-4">Все пользователи</Link>
                             </div>
                         </form>
                     </div>
