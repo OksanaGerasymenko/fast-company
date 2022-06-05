@@ -106,6 +106,7 @@ const EditForm = ({ userId }) => {
             profession: getProfessionById(profession),
             qualities: getQualities(qualities)
         });
+        history.goBack();
     };
 
     const isValid = Object.keys(errors).length === 0;

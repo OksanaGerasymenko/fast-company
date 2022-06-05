@@ -9,21 +9,25 @@ const Comments = () => {
     const { userId } = useParams();
     const [comments, setComments] = useState([]);
     useEffect(() => {
-        api.comments.fetchCommentsForUser(userId)
+        api.comments
+            .fetchCommentsForUser(userId)
             .then(data => setComments(data));
     }, []);
 
     const sorteredComments = orderBy(comments, ["created_at"], ["desc"]);
     const handleRemove = (id) => {
-        api.comments.remove(id)
+        api.comments
+            .remove(id)
             .then(id => setComments(comments.filter(comment => comment._id !== id)));
     };
     const handleSubmit = (data) => {
-        api.comments.add({ ...data, pageId: userId })
-            .then(newComment => setComments(prevState => ({
-                ...prevState,
-                newComment
-            })));
+        console.log(comments);
+        api.comments
+            .add({ ...data, pageId: userId })
+            .then((data) => {
+                setComments([...comments, data]);
+                console.log(comments);
+            });
     };
     return (
         <>
