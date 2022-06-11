@@ -3,9 +3,9 @@ import PropTypes from "prop-types";
 import { toast } from "react-toastify";
 import professionService from "../services/profession.service";
 
-const professionContext = React.createContext();
+const ProfessionContext = React.createContext();
 export const useProfession = () => {
-    return useContext(professionContext);
+    return useContext(ProfessionContext);
 };
 
 export const ProfessionProvider = ({ children }) => {
@@ -13,14 +13,14 @@ export const ProfessionProvider = ({ children }) => {
     const [isLoading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     useEffect(() => {
-        getProfessions();
+        getProfessionsList();
     }, []);
     useEffect(() => {
         toast.error(error);
         setError(null);
     }, [error]);
 
-    async function getProfessions() {
+    async function getProfessionsList() {
         try {
             const { content } = await professionService.get();
             setProfessions(content);
@@ -33,10 +33,15 @@ export const ProfessionProvider = ({ children }) => {
         setError(message);
     }
 
+    function getProfession(id) {
+        return professions.find(p => p._id === id);
+    }
     return (
-        <ProfessionProvider value={{ professions, isLoading }}>
-            {!isLoading ? children : "profesiion loading..."}
-        </ProfessionProvider>
+        <ProfessionContext.Provider
+            value={{ professions, isLoading, getProfession }}
+        >
+            {children}
+        </ProfessionContext.Provider>
     );
 };
 ProfessionProvider.propTypes = {

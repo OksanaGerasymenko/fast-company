@@ -34,9 +34,9 @@ const Bookmark = ({ userId, bookmark, onChangeBookmark }) => {
     );
 };
 Bookmark.propTypes = {
-    userId: PropTypes.string.isRequired,
-    bookmark: PropTypes.bool.isRequired,
-    onChangeBookmark: PropTypes.func.isRequired
+    userId: PropTypes.string,
+    bookmark: PropTypes.bool,
+    onChangeBookmark: PropTypes.func
 };
 
 export default Bookmark;

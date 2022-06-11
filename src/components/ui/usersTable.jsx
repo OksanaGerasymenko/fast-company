@@ -3,17 +3,19 @@ import Bookmark from "../ui/bookmark";
 import Table from "../common/table";
 import PropTypes from "prop-types";
 import Qualities from "../ui/qualities";
+import Profession from "./profession";
 
 const UsersTable = ({ users, onDelete, onChangeBookmark, onSort, selectedSort }) => {
     const columns = {
         name: { path: "name", name: "Имя" },
         qualities: {
             name: "Качества",
-            component: (user) => (
-                <Qualities qualities={user.qualities} />
-            )
+            component: (user) => <Qualities qualitiesId={user.qualities} />
         },
-        profession: { path: "profession.name", name: "Профессия" },
+        profession: {
+            name: "Профессия",
+            component: (user) => <Profession id={user.profession} />
+        },
         completedMeetings: { path: "completedMeetings", name: "Встретился, раз" },
         rate: { path: "rate", name: "Оценка" },
         bookmark: {
