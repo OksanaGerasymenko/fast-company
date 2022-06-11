@@ -7,31 +7,29 @@ import api from "../../../api";
 import GroupList from "../../common/groupList";
 import SearchStatus from "../../ui/searchStatus";
 import _ from "lodash";
+import { useUser } from "../../../hooks/useUser";
 
 const UsersListPage = () => {
     const pageSize = 8;
-    const [users, setUsers] = useState();
-
-    useEffect(() => {
-        api.users.fetchAll().then(data => setUsers(data));
-    }, []);
-    const handleDelete = (userId) => {
-        setUsers(users.filter((user) => user._id !== userId));
-    };
-
-    const handleBookmark = (userId) => {
-        setUsers(
-            users.map((user) => {
-                if (user._id === userId) user.bookmark = !user.bookmark;
-                return user;
-            })
-        );
-    };
+    const { users } = useUser();
     const [currentPage, setCurrentPage] = useState(1);
     const [professions, setProfessions] = useState(api.professions.fetchAll());
     const [selectedProf, setSelectedProf] = useState();
     const [sortBy, setSortBy] = useState({ path: "name", order: "asc" });
     const [searchString, setSearchString] = useState("");
+
+    const handleDelete = (userId) => {
+        // setUsers(users.filter((user) => user._id !== userId));
+        console.log(userId);
+    };
+
+    const handleBookmark = (userId) => {
+        const newArray = users.map((user) => {
+            if (user._id === userId) user.bookmark = !user.bookmark;
+            return user;
+        });
+        console.log(newArray);
+    };
 
     useEffect(() => {
         api.professions.fetchAll().then((data) => { setProfessions(data); });
