@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import { validator } from "../../utils/validator";
 import TextField from "../common/form/textField";
 import CheckBoxField from "../common/form/checkBoxField";
+import { useHistory } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 const LoginForm = () => {
+    const history = useHistory();
     const [data, setData] = useState({ email: "", password: "", stayOn: false });
     const [errors, setErrors] = useState({});
     const handleChange = (target) => {
@@ -33,13 +36,19 @@ const LoginForm = () => {
         return Object.keys(errors).length === 0;
     };
 
-    const handleSubmit = (event) => {
+    const { signIn } = useAuth();
+    const handleSubmit = async(event) => {
         event.preventDefault();
         if (!validate()) return;
-        console.log(data);
+        try {
+            await signIn(data);
+            history.push("/");
+        } catch (error) {
+            setErrors(error);
+        }
     };
 
-    const isValid = !(Object.keys(errors).length === 0);
+    const isValid = Object.keys(errors).length === 0;
     return (
         <>
             <form onSubmit={handleSubmit}>
@@ -65,7 +74,7 @@ const LoginForm = () => {
                 >
                     Оставаться в системе
                 </CheckBoxField>
-                <button disabled={isValid} className="btn btn-primary w-100 mb-4">Отправить</button>
+                <button disabled={!isValid} className="btn btn-primary w-100 mb-4">Отправить</button>
             </form>
         </>
     );

@@ -5,9 +5,13 @@ import SelectField from "../common/form/selectField";
 import RadioField from "../common/form/radioField";
 import MultiSelectField from "../common/form/multiSelectField";
 import CheckBoxField from "../common/form/checkBoxField";
-import api from "../../api";
+import { useQuality } from "../../hooks/useQuality";
+import { useProfession } from "../../hooks/useProfession";
+import { useAuth } from "../../hooks/useAuth";
+import { useHistory } from "react-router-dom";
 
 const RegisterForm = () => {
+    const history = useHistory();
     const [data, setData] = useState({
         email: "",
         password: "",
@@ -16,10 +20,18 @@ const RegisterForm = () => {
         qualities: [],
         licence: false
     });
-    const [professions, setProfessions] = useState([]);
-    const [qualities, setQualities] = useState([]);
+    const { professions } = useProfession();
+    const { qualities } = useQuality();
     const [errors, setErrors] = useState({});
-
+    const professionsList = professions.map(profession => ({
+        label: profession.name,
+        value: profession._id
+    }));
+    const qualitiesList = qualities.map(quality => ({
+        label: quality.name,
+        value: quality._id,
+        color: quality.color
+    }));
     const handleChange = (target) => {
         setData((prevState) => ({
             ...prevState,
@@ -27,23 +39,6 @@ const RegisterForm = () => {
         }));
     };
 
-    useEffect(() => {
-        api.professions.fetchAll().then((data) => {
-            const professionArray = Object.keys(data).map(professionName => ({
-                label: data[professionName].name,
-                value: data[professionName]._id
-            }));
-            setProfessions(professionArray);
-        });
-        api.qualities.fetchAll().then((data) => {
-            const qualitiesArray = Object.keys(data).map(qualityName => ({
-                label: data[qualityName].name,
-                value: data[qualityName]._id,
-                color: data[qualityName].color
-            }));
-            setQualities(qualitiesArray);
-        });
-    }, []);
     useEffect(() => { validate(); }, [data]);
 
     const validateConfig = {
@@ -71,34 +66,18 @@ const RegisterForm = () => {
         return Object.keys(errors).length === 0;
     };
 
-    const getProfessionById = (id) => {
-        for (const profession of professions) {
-            if (profession.value === id) {
-                return {
-                    _id: profession.value,
-                    name: profession.label
-                };
-            }
-        }
-    };
-
-    const getQualities = (elements) => {
-        return elements.map(elem => ({
-            _id: elem.value,
-            name: elem.label,
-            color: elem.color
-        }));
-    };
-
-    const handleSubmit = (event) => {
+    const { signUp } = useAuth();
+    async function handleSubmit(event) {
         event.preventDefault();
         if (!validate()) return;
-        const { profession, qualities } = data;
-        console.log({
-            ...data,
-            profession: getProfessionById(profession),
-            qualities: getQualities(qualities)
-        });
+        const qualitiesId = data.qualities.map(q => q.value);
+        const newData = { ...data, qualities: qualitiesId };
+        try {
+            await signUp(newData);
+            history.push("/");
+        } catch (error) {
+            setErrors(error);
+        };
     };
 
     const isValid = Object.keys(errors).length === 0;
@@ -127,7 +106,7 @@ const RegisterForm = () => {
                     name="profession"
                     defaultOption="выберите из списка"
                     onChange={handleChange}
-                    options = {professions}
+                    options = {professionsList}
                     error={errors.profession}
                 />
                 <RadioField
@@ -142,7 +121,7 @@ const RegisterForm = () => {
                     label="Выберите ваш пол"
                 />
                 <MultiSelectField
-                    options = {qualities}
+                    options = {qualitiesList}
                     name="qualities"
                     onChange={handleChange}
                     label="Укажите ваши качества"
