@@ -2,35 +2,43 @@ import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router";
 import { validator } from "../../utils/validator";
 import TextField from "../common/form/textField";
+import ImageField from "../../components/common/form/imageField";
 import SelectField from "../common/form/selectField";
 import RadioField from "../common/form/radioField";
 import MultiSelectField from "../common/form/multiSelectField";
-import api from "../../api";
-import PropTypes from "prop-types";
+import { useProfession } from "../../hooks/useProfession";
+import { useQuality } from "../../hooks/useQuality";
+import { useAuth } from "../../hooks/useAuth";
 
-const EditForm = ({ userId }) => {
-    const [data, setData] = useState({});
-    const [professions, setProfessions] = useState([]);
-    const [qualities, setQualities] = useState([]);
+const EditUserPage = () => {
+    const { currentUser, updateUser } = useAuth();
+    const { professions, isLoading: professionLoading } = useProfession();
+    const { qualities, getQualitiesForUser, isLoading: qualityLoading } = useQuality();
+    const qualitiesForForm = getQualitiesForUser(currentUser.qualities)?.map(quality => ({
+        label: quality.name,
+        value: quality._id,
+        color: quality.color
+    }));
     const [errors, setErrors] = useState({});
     const history = useHistory();
-    useEffect(() => {
-        api.users.getById(userId).then(user => {
-            const userQualitiesForForm = user.qualities.map(quality => ({
-                label: quality.name,
-                value: quality._id,
-                color: quality.color
-            }));
-            setData({
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                profession: user.profession._id,
-                sex: user.sex,
-                qualities: userQualitiesForForm
-            });
-        });
-    }, []);
+    const [data, setData] = useState({
+        _id: currentUser._id,
+        name: currentUser.name,
+        email: currentUser.email,
+        image: currentUser.image,
+        profession: currentUser.profession,
+        sex: currentUser.sex,
+        qualities: qualitiesForForm
+    });
+    const professionsList = professions?.map(profession => ({
+        label: profession.name,
+        value: profession._id
+    }));
+    const qualitiesList = qualities?.map(quality => ({
+        label: quality.name,
+        value: quality._id,
+        color: quality.color
+    }));
 
     const handleChange = (target) => {
         setData((prevState) => ({
@@ -39,23 +47,6 @@ const EditForm = ({ userId }) => {
         }));
     };
 
-    useEffect(() => {
-        api.professions.fetchAll().then((data) => {
-            const professionArray = Object.keys(data).map(professionName => ({
-                label: data[professionName].name,
-                value: data[professionName]._id
-            }));
-            setProfessions(professionArray);
-        });
-        api.qualities.fetchAll().then((data) => {
-            const qualitiesArray = Object.keys(data).map(qualityName => ({
-                label: data[qualityName].name,
-                value: data[qualityName]._id,
-                color: data[qualityName].color
-            }));
-            setQualities(qualitiesArray);
-        });
-    }, []);
     useEffect(() => { validate(); }, [data]);
 
     const validateConfig = {
@@ -78,50 +69,24 @@ const EditForm = ({ userId }) => {
         return Object.keys(errors).length === 0;
     };
 
-    const getProfessionById = (id) => {
-        for (const profession of professions) {
-            if (profession.value === id) {
-                return {
-                    _id: profession.value,
-                    name: profession.label
-                };
-            }
-        }
-    };
-
-    const getQualities = (elements) => {
-        return elements.map(elem => ({
-            _id: elem.value,
-            name: elem.label,
-            color: elem.color
-        }));
-    };
-
-    const handleSubmit = (event) => {
+    async function handleSubmit(event) {
         event.preventDefault();
         if (!validate()) return;
-        const { profession, qualities } = data;
-        api.users.update(data._id, {
-            ...data,
-            profession: getProfessionById(profession),
-            qualities: getQualities(qualities)
-        });
-        history.goBack();
+        const qualitiesId = data.qualities.map(q => q.value);
+        const newData = { ...data, qualities: qualitiesId };
+        try {
+            await updateUser(newData);
+            history.goBack();
+        } catch (error) {
+            console.log(error);
+        };
     };
 
     const isValid = Object.keys(errors).length === 0;
 
     return (
-        data._id
+        (!professionLoading && !qualityLoading)
             ? <div className="container mt-5">
-                <div className="row">
-                    <div className="col-md-3 offset-md-1">
-                        <button className="btn btn-primary" onClick={() => history.goBack()}>
-                            <i className="bi bi-caret-left-fill"></i>
-                            Назад
-                        </button>
-                    </div>
-                </div>
                 <div className="row">
                     <div className="col-md-6 offset-md-3 shadow p-4">
                         <h3 className="mb-4 text-center">Редактирование профиля</h3>
@@ -133,21 +98,19 @@ const EditForm = ({ userId }) => {
                                 onChange={handleChange}
                                 error={errors.name}
                             />
-                            <TextField
-                                label="Электронная почта"
-                                name="email"
-                                value={data.email}
+                            <ImageField
+                                label="фото"
+                                name="image"
                                 onChange={handleChange}
-                                error={errors.email}
+                                value={data.image}
                             />
-
                             <SelectField
                                 label="Профессия"
                                 value={data.profession}
                                 name="profession"
                                 defaultOption="выберите из списка"
                                 onChange={handleChange}
-                                options = {professions}
+                                options = {professionsList}
                                 error={errors.profession}
                             />
                             <RadioField
@@ -162,14 +125,18 @@ const EditForm = ({ userId }) => {
                                 label="Выберите ваш пол"
                             />
                             <MultiSelectField
-                                options = {qualities}
+                                options = {qualitiesList}
                                 name="qualities"
                                 onChange={handleChange}
                                 label="Укажите ваши качества"
                                 value={data.qualities}
                             />
                             <div className="d-flex justify-content-evenly">
-                                <button disabled={!isValid} className="btn btn-primary mb-4">Сохранить</button>
+                                <button className="btn btn-primary mt-4" onClick={() => history.goBack()}>
+                                    <i className="bi bi-caret-left-fill"></i>
+                            Назад
+                                </button>
+                                <button disabled={!isValid} className="btn btn-primary mt-4">Сохранить</button>
                             </div>
                         </form>
                     </div>
@@ -178,7 +145,4 @@ const EditForm = ({ userId }) => {
             : <>Loading...</>
     );
 };
-EditForm.propTypes = {
-    userId: PropTypes.string.isRequired
-};
-export default EditForm;
+export default EditUserPage;

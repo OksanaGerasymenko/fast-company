@@ -35,7 +35,7 @@ export const QualityProvider = ({ children }) => {
 
     function getQualitiesForUser(qualitiesId) {
         const qualitiesForUser = [];
-        qualitiesId.forEach(id => {
+        qualitiesId?.forEach(id => {
             const quality = qualities.find(q => q._id === id);
             qualitiesForUser.push(quality);
         });

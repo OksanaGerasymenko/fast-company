@@ -19,7 +19,7 @@ const Qualities = ({ qualitiesId }) => {
                         </span>
                     ))
                 )
-                : <p>loading...</p>
+                : <>loading...</>
             }
         </>
     );

@@ -1,28 +1,27 @@
-import React, { useState, useEffect } from "react";
-import QualitiesCard from "../../ui/qualitiesCard";
-import UserCard from "../../ui/userCard";
-import MeetingsCard from "../../ui/meetingsCard";
-import Comments from "../../ui/comments";
+import React from "react";
+import QualitiesCard from "../ui/qualitiesCard";
+import UserCard from "../ui/userCard";
+import MeetingsCard from "../ui/meetingsCard";
+import Comments from "../ui/comments";
 import PropTypes from "prop-types";
-import api from "../../../api";
+import { useUser } from "../../hooks/useUser";
+import { CommentProvider } from "../../hooks/useComment";
 
 const UserPage = ({ userId }) => {
-    const [user, setUser] = useState();
-    useEffect(() => {
-        api.users.getById(userId).then(user => setUser(user));
-    }, []);
-
+    const user = useUser().getUserById(userId);
     return (
         <div className="container">
             {user
                 ? <div className="row gutters-sm">
                     <div className="col-md-4 mb-3">
                         <UserCard user={user}/>
-                        <QualitiesCard qualities={user.qualities}/>
+                        <QualitiesCard qualitiesId={user.qualities}/>
                         <MeetingsCard value={user.completedMeetings} />
                     </div>
                     <div className="col-md-8">
-                        <Comments />
+                        <CommentProvider>
+                            <Comments />
+                        </CommentProvider>
                     </div>
                 </div>
                 : "Loading..."

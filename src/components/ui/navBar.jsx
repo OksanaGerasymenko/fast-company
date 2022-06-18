@@ -1,32 +1,37 @@
-import React, { useState } from "react";
-import Menu from "../common/menu";
-import { useHistory } from "react-router";
-
-const menu = [
-    { _id: 1, name: "Main", path: "/" },
-    { _id: 2, name: "Login", path: "/login" },
-    { _id: 3, name: "Users", path: "/users" }
-];
+import React from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import NavProfile from "./navProfile";
 
 const NavBar = () => {
-    const history = useHistory();
-    const menuActive = menu.find(item => item.path === history.location.pathname);
-    const [menuItem, setMenuItem] = useState(menuActive);
-    const handleItemSelect = (item) => {
-        setMenuItem(item);
-    };
-
+    const { currentUser } = useAuth();
     return (
-        <>
-            <h4 className="navBar">
-                <Menu
-                    items = {menu}
-                    onItemSelect = {handleItemSelect}
-                    selectedItem = {menuItem}
-                    isHorizontal = {true}
-                />
-            </h4>
-        </>
+        <nav className="navbar bg-light mb-3">
+            <div className="container-fluid">
+                <ul className="nav">
+                    <li className="navitem">
+                        <Link className="nav-link" aria-current="page" to="/">
+                            Main
+                        </Link>
+                    </li>
+                    {currentUser && (
+                        <li className="navitem">
+                            <Link className="nav-link" aria-current="page" to="/users">
+                                Users
+                            </Link>
+                        </li>
+                    )}
+                </ul>
+                <div className="d-flex">
+                    {currentUser
+                        ? <NavProfile />
+                        : <Link className="nav-link" aria-current="page" to="/login">
+                            Login
+                        </Link> }
+
+                </div>
+            </div>
+        </nav>
 
     );
 };
