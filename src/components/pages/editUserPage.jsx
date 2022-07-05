@@ -6,14 +6,13 @@ import ImageField from "../../components/common/form/imageField";
 import SelectField from "../common/form/selectField";
 import RadioField from "../common/form/radioField";
 import MultiSelectField from "../common/form/multiSelectField";
-import { useAuth } from "../../hooks/useAuth";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { getQualities, getQualitiesLoadingStatus, getQualitiesByIds } from "../../store/qualities";
 import { getProfessions, getProfessionsLoadingStatus } from "../../store/professions";
-import { getCurrentUser } from "../../store/users";
+import { getCurrentUser, updateUser } from "../../store/users";
 
 const EditUserPage = () => {
-    const { updateUser } = useAuth();
+    const dispatch = useDispatch();
     const currentUser = useSelector(getCurrentUser());
     const professions = useSelector(getProfessions());
     const professionLoading = useSelector(getProfessionsLoadingStatus());
@@ -82,12 +81,7 @@ const EditUserPage = () => {
         if (!validate()) return;
         const qualitiesId = data.qualities.map(q => q.value);
         const newData = { ...data, qualities: qualitiesId };
-        try {
-            await updateUser(newData);
-            history.goBack();
-        } catch (error) {
-            console.log(error);
-        };
+        dispatch(updateUser(newData));
     };
 
     const isValid = Object.keys(errors).length === 0;
