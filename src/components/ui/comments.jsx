@@ -2,24 +2,24 @@ import React, { useEffect } from "react";
 import { orderBy } from "lodash";
 import AddCommentForm from "../common/comments/addCommentForm";
 import CommentsList from "../common/comments/commentsList";
-import { useComment } from "../../hooks/useComment";
 import { useDispatch, useSelector } from "react-redux";
-import { loadCommentsList, getCommentsLoadingStatus, getComments } from "../../store/comments";
+import { loadCommentsList, getCommentsLoadingStatus, getComments, removeComment, createComment } from "../../store/comments";
 import { useParams } from "react-router";
+import { getCurrentUserId } from "../../store/users";
 
 const Comments = () => {
     const { userId } = useParams();
+    const currentUserId = useSelector(getCurrentUserId());
     const dispatch = useDispatch();
     useEffect(() => { dispatch(loadCommentsList(userId)); }, [userId]);
-    const { createComment, removeComment } = useComment();
     const isLoading = useSelector(getCommentsLoadingStatus());
     const comments = useSelector(getComments());
     const sorteredComments = orderBy(comments, ["created_at"], ["desc"]);
     const handleRemove = (id) => {
-        removeComment(id);
+        dispatch(removeComment(id));
     };
     const handleSubmit = (data) => {
-        createComment(data);
+        dispatch(createComment({ data, userId, currentUserId }));
     };
     return (
         <>
