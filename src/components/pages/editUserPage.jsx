@@ -6,15 +6,21 @@ import ImageField from "../../components/common/form/imageField";
 import SelectField from "../common/form/selectField";
 import RadioField from "../common/form/radioField";
 import MultiSelectField from "../common/form/multiSelectField";
-import { useProfession } from "../../hooks/useProfession";
-import { useQuality } from "../../hooks/useQuality";
 import { useAuth } from "../../hooks/useAuth";
+import { useSelector } from "react-redux";
+import { getQualities, getQualitiesLoadingStatus, getQualitiesByIds } from "../../store/qualities";
+import { getProfessions, getProfessionsLoadingStatus } from "../../store/professions";
+import { getCurrentUser } from "../../store/users";
 
 const EditUserPage = () => {
-    const { currentUser, updateUser } = useAuth();
-    const { professions, isLoading: professionLoading } = useProfession();
-    const { qualities, getQualitiesForUser, isLoading: qualityLoading } = useQuality();
-    const qualitiesForForm = getQualitiesForUser(currentUser.qualities)?.map(quality => ({
+    const { updateUser } = useAuth();
+    const currentUser = useSelector(getCurrentUser());
+    const professions = useSelector(getProfessions());
+    const professionLoading = useSelector(getProfessionsLoadingStatus());
+    const qualities = useSelector(getQualities());
+    const qualityLoading = useSelector(getQualitiesLoadingStatus());
+    const qualitiesUser = useSelector(getQualitiesByIds(currentUser.qualities));
+    const qualitiesForForm = qualitiesUser?.map(quality => ({
         label: quality.name,
         value: quality._id,
         color: quality.color
@@ -28,7 +34,9 @@ const EditUserPage = () => {
         image: currentUser.image,
         profession: currentUser.profession,
         sex: currentUser.sex,
-        qualities: qualitiesForForm
+        qualities: qualitiesForForm,
+        rate: currentUser.rate,
+        completedMeetings: currentUser.completedMeetings
     });
     const professionsList = professions?.map(profession => ({
         label: profession.name,

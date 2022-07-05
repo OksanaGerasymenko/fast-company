@@ -6,16 +6,17 @@ import { searchItems } from "../../utils/searchItems";
 import GroupList from "../common/groupList";
 import SearchStatus from "../ui/searchStatus";
 import _ from "lodash";
-import { useUser } from "../../hooks/useUser";
-import { useProfession } from "../../hooks/useProfession";
-import { useAuth } from "../../hooks/useAuth";
+import { useSelector } from "react-redux";
+import { getProfessions, getProfessionsLoadingStatus } from "../../store/professions";
+import { getUsers, getCurrentUserId } from "../../store/users";
 
 const UsersListPage = () => {
     const pageSize = 8;
-    const { users } = useUser();
-    const { currentUser } = useAuth();
+    const users = useSelector(getUsers());
+    const currentUserId = useSelector(getCurrentUserId());
     const [currentPage, setCurrentPage] = useState(1);
-    const { professions, isLoading: professionLoading } = useProfession();
+    const professionLoading = useSelector(getProfessionsLoadingStatus());
+    const professions = useSelector(getProfessions());
     const [selectedProf, setSelectedProf] = useState();
     const [sortBy, setSortBy] = useState({ path: "name", order: "asc" });
     const [searchString, setSearchString] = useState("");
@@ -61,7 +62,7 @@ const UsersListPage = () => {
                     return destructUserProf._id === selectedProf._id;
                 })
                 : data;
-        return filteredUsers.filter(user => user._id !== currentUser._id);
+        return filteredUsers.filter(user => user._id !== currentUserId);
     };
 
     if (!users) return "Loading...";
