@@ -1,0 +1,5 @@
+{
+    "port": 8080,
+    "mongoUri": "mongodb+srv://oksana:8ca7yBQSec3vG9T@fast-company-db.2xw1t0k.mongodb.net/?retryWrites=true&w=majority"
+}
+
